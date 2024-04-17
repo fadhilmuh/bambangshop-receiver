@@ -86,4 +86,11 @@ This is the place for you to write reflections:
 
 #### Reflection Subscriber-1
 
+
+1. Penggunaan RwLock<> untuk mensinkronisasi penggunaan Vec dari Notifikasi diperlukan dalam kasus ini karena memungkinkan akses bersama untuk pembaca (readers) dan eksklusif untuk penulis (writer). Dalam konteks notifikasi, banyak subscriber mungkin akan membaca data notifikasi secara bersamaan, sementara proses penulisan (seperti menambah atau menghapus notifikasi) harus dilakukan secara eksklusif untuk menghindari kondisi race dan konsistensi data. RwLock<> memungkinkan banyak pembaca untuk mengakses data secara bersamaan tanpa blok, sementara hanya satu penulis yang dapat mengakses data pada satu waktu.
+
+    Kita tidak menggunakan Mutex<> karena Mutex<> hanya memungkinkan satu thread untuk memiliki akses eksklusif pada suatu waktu. Dalam kasus notifikasi di mana banyak pembaca mungkin akan mengakses data secara bersamaan, menggunakan Mutex<> dapat mengakibatkan performa yang buruk karena pembaca harus secara bergantian bersaing untuk mendapatkan akses eksklusif. RwLock<> lebih cocok karena memungkinkan pembaca untuk mengakses data secara bersamaan tanpa memblokir satu sama lain, sementara proses penulisan tetap eksklusif.
+
+2. Penggunaan lazy_static eksternal library untuk mendefinisikan Vec dan DashMap sebagai variabel "static" dibutuhkan karena Rust memiliki aturan yang ketat terkait dengan penyimpanan variabel statis. Dalam Rust, variabel statis defaultnya tidak dapat diubah, dan mengizinkan mutasi langsung dari variabel statis bisa memunculkan masalah keamanan dan thread safety. Oleh karena itu, Rust memerlukan pendekatan yang lebih hati-hati dalam penggunaan variabel statis, dan menggunakan lazy_static memungkinkan kita untuk menginisialisasi variabel statis dengan cara yang aman dan dapat diprediksi pada waktu runtime. Hal ini membantu menjaga keamanan dan integritas data dalam aplikasi Rust.
+
 #### Reflection Subscriber-2
